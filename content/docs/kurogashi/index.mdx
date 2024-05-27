@@ -1,0 +1,71 @@
+---
+title: Quick Start
+description: Getting Started with Kurogashi
+icon: Album
+---
+
+A simple and lightweight web framework for Bun
+
+## Automatic Installation
+
+### Initialize Project
+
+```bash
+bun create kurogashi [project-name]
+```
+
+## Breaking Down
+
+This will create a new project with the following structure:
+
+<Files>
+    <Folder name="src" defaultOpen>
+        <Folder name="routes" defaultOpen>
+            <File name="index.ts" />
+        </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name="kurogashi.config.ts" />
+    <File name=".gitignore" />
+</Files>
+
+The `package.json` will contain two scripts `build` and `dev`:
+
+### Building your app
+
+Read more about build and presets [here](/docs/build)
+
+### Running your app
+
+Running this script will spin up a development server with hot reload.
+
+Dev command uses default `bun` preset
+
+## Chaning port
+You can either change the port in the `kurogashi.config.ts` (server.port) or by setting the `PORT` environment variable.
+
+## Learn More
+
+<Cards>
+    <Card
+        href="/docs/build"
+        title="Build"
+        description="Learn about building and presets"
+    />
+    <Card
+        href="/docs/routing"
+        title="Learn routing"
+        description="Learn how to use routing in Kurogashi"
+    />
+    <Card
+        href="/docs/ui/theme"
+        title="Theming"
+        description="Add themes to Fumadocs UI"
+    />
+    <Card
+        href="/docs/ui/components/codeblock"
+        title="Code Block"
+        description="Learn how to use code blocks in MDX"
+    />
+</Cards>

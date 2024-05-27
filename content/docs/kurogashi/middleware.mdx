@@ -1,0 +1,70 @@
+---
+title: Middleware
+description: Learn about using middlewares
+icon: Layers
+---
+
+## Introduction
+
+Middlewares are executed before the route handler. They can be used to modify the request or response object.
+
+## Usage
+
+To use a middleware, you can create `middleware` folder.
+
+<Files>
+    <Folder name="src" defaultOpen>
+        <Folder name="midldeware" defaultOpen>
+            <File name="logger.ts" />
+        </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name="kurogashi.config.ts" />
+    <File name=".gitignore" />
+</Files>
+
+They are similar to routes. Each file in the folder is a middleware.
+
+```ts title="src/middleware/logger.ts"
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    console.log('Request:', event.req);
+});
+```
+
+<Callout title="Middleware Execution" type="warn">
+    Middleware doesn't have a `next` function.
+    Execution moves to the next middleware when the current one finishes or sends a response.
+    Sending a response stops further execution.
+</Callout>
+
+## Filtering
+
+By default, all middlewares are executed on every request. You can filter them by using `url`
+
+```ts title="src/middleware/logger.ts"
+import { defineEventHandler, getPathname } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    const pathname = getPathname(event)
+
+    if (pathname.startsWith('/api')) {
+        console.log('Request:', event.req);
+    }
+});
+```
+
+## Order
+
+Middlewares are executed based on the directory listing. You can control the order by renaming the files.
+
+<Files>
+    <Folder name="src" defaultOpen>
+        <Folder name="midldeware" defaultOpen>
+            <File name="00-logger.ts" />
+            <File name="01-auth.ts" />
+        </Folder>
+    </Folder>
+</Files>

@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "pages": [
+    "---Guide---",
+    "index",
+    "routing",
+    "middleware",
+    "event",
+    "build"
+  ]
+}

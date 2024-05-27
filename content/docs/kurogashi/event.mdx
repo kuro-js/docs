@@ -1,0 +1,177 @@
+---
+title: Event handler
+description: Learn everything about events and handlers in Kurogashi
+icon: SquareGanttChart
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Events are created from incoming request and are provided to every layer in the stack (routes and middlewares)
+
+## Usage
+
+To create an event handler, you can use `defineEventHandler` function and export as default if using Kurogashi.
+
+```ts
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    ...
+});
+```
+
+## Returning values
+
+You can return anything from the handler. If type of returned value couldn't be detected it will try to send body as `text/plain` and if it fails `204` status code will be sent.
+
+### Returning `Response` instance
+
+```ts
+import { defineEventHandler, setHeader } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return new Response('Hello World');
+});
+```
+
+### Returning object, array, bigint, number, boolean
+
+These types will be sent as `application/json`.
+
+### Returning null
+
+`null` will end response with status code `204`.
+
+
+### Returning html
+
+```ts
+import { defineEventHandler, sendHtml, setHeader } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    // Set header by yourself
+    setHeader(event, "Content-Type", "text/html")
+    return '<h1>Hello World</h1>';
+
+    // Or use built-in function
+    return sendHtml(event, '<h1>Hello World</h1>');
+});
+```
+
+### Returning errors
+
+```ts
+import { defineEventHandler, createError } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return createError({
+        message: "Cannot find handler for request",
+        statusCode: 404,
+    });
+});
+```
+
+You can return error object using `createError` function. While handling response it will be thrown.
+
+Or throw error directly:
+
+```ts
+import { defineEventHandler, createError } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    throw createError({
+        message: "Cannot find handler for request",
+        statusCode: 404,
+    });
+});
+```
+
+### Other
+
+Handlers also support returning `Promise`, `Function`, `AsyncFunction`, `ReadbleStream` and `Server Sent Events`.
+
+## Request and response
+You can access original request and created response through:
+
+```ts
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    console.log('Request:', event.req);
+    console.log('Response:', event.res);
+
+    return "Response";
+});
+```
+
+## Context
+
+You can pass context to the handler by using `context` property in the event object.
+
+```ts title="src/middleware/context.ts"
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    event.context.user = {
+        name: 'John Doe'
+    };
+});
+```
+
+### Types
+
+There are two ways to define types for the event handler:
+
+<Steps>
+    <Step>
+        Create `*.d.ts` file somewhere in your project
+    </Step>
+
+    <Step>
+        Define types for the event handler:
+
+        ```ts title="src/context.d.ts"
+        declare module 'gashi' {
+            interface GashiContext {
+                user: {
+                    name: string;
+                };
+            }
+        };
+        export {}
+        ```
+    </Step>
+</Steps>
+
+Or use runtime types
+
+<Steps>
+    <Step>
+        Create `*.ts` file somewhere in your project with exported type named `Context`
+
+        ```ts title="src/context.ts"
+        export type Context = {
+            user: {
+                name: string;
+            };
+        };
+        ```
+    </Step>
+
+    <Step>
+        Add `extend` property to `kurogashi.config.ts`
+
+        ```ts title="kurogashi.config.ts"
+        import { defineConfig } from 'kurogashi';
+
+        export default defineConfig({
+            extend: 'src/context.ts',
+        });
+        ```
+    </Step>
+</Steps>
+
+This will automatically generate runtime types when running `bun dev` command.
+
+[//]: # (Remove when route types will be added)
+In the future runtime types will be used for other features.

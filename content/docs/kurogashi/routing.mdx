@@ -1,0 +1,104 @@
+---
+title: Routing
+description: Learn about file based routing in Kurogashi
+icon: Route
+---
+
+## Introduction
+
+Routing in Kurogashi works the same way as in [Nitro](https://nitro.unjs.io/guide/routing).
+Routes are automatically mapped to the `gashi` that uses radix tree to match the routes.
+
+## Defining routes
+
+Routes are defined using `defineEventHandler` and exported as default.
+This function allows to easily handle routes, websockets and OpenAPI
+
+<Callout title="Warning" type="warn">
+    If you try to export route not using `defineEventHandler`, it will throw an error.
+</Callout>
+
+```ts title="src/routes/index.ts"
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return {
+        user: {
+            name: 'John Doe'
+        }
+    };
+});
+```
+
+<Card
+    href="/docs/event"
+    title="Event"
+    description="Learn everything about events in Kurogashi"
+/>
+
+## File based routing
+
+Routes are located in the `src/routes` folder. Each file in the folder is a route.
+
+`index` in routes name will be stripped. So for example
+```txt
+src/routes/index.ts -> /
+src/routes/test/index.ts -> /test
+```
+
+To define a method for a route, you can add an extension to the file name. By default, the method will be `GET`
+
+```txt
+src/routes/test/index.ts -> /test GET
+src/routes/test/index.post.ts -> /test POST
+```
+
+## Dynamic routes
+
+### Single parameter
+You can define dynamic routes by using `[^param^]`. ^param^ will be the parameter name.
+
+```txt
+src/routes/test/[name].ts -> /test/:name
+```
+
+To access the parameter, you can use `params` in the event object.
+
+```ts title="src/routes/[name].ts"
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return `Hello ${event.params?.name}`
+});
+```
+
+### Multiple parameters
+
+Use [^param1^]/[^param2^] to define multiple parameters in a route.
+Each parameter should be in a separate folder. You can't have multiple parameters in a single filename or folder.
+
+```ts title="src/routes/[name]/[id].ts"
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return `Hello ${event.params?.name} with id ${event.params?.id}`
+});
+```
+
+### Wildcard/All routes
+
+You can define a wildcard route by using `[...^param^]`. ^param^ will be the parameter name.
+Parameters will be joined by `/`.
+
+```ts title="src/routes/test/[...all].ts
+import { defineEventHandler } from 'kurogashi';
+
+export default defineEventHandler((event) => {
+    return `Hello ${event.params?.all}`
+});
+```
+
+```txt
+/test/hello/world -> `Hello hello/world`
+/test/hello/world/again -> `Hello hello/world/again`
+```

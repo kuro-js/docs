@@ -1,0 +1,45 @@
+---
+title: Build and presets
+description: Learn about building and presets
+icon: Hammer
+---
+
+Presets are inspired by [Nitro](https://nitro.unjs.io/deploy) and are used to define how the project should be built.
+
+Most of the providers support either `Bun` or `Docker` presets.
+
+## Specifying presets
+
+Presets are defined in the `kurogashi.config.ts` file.
+
+```ts title="kurogashi.config.ts"
+import { defineConfig } from 'kurogashi';
+
+export default defineConfig({
+    presets: "bun"
+});
+```
+
+## Creating custom presets
+
+You can create custom presets by defining a function that returns a configuration object.
+
+```ts title="kurogashi.config.ts"
+import { defineConfig, definePreset } from 'kurogashi';
+
+const customPreset = definePreset({
+  entry: Bun.fileURLToPath(new URL("entry.ts", import.meta.url)),
+  outputDir: "{{ outputDir }}/custom",
+  hooks: {
+    "rollup:compiled": async (kuro) => {
+      kuro.logger.info("Project compiled!");
+    }
+  }
+})
+
+export default defineConfig({
+  preset: customPreset,
+});
+```
+
+Presets are basically extensions of the configuration object.
